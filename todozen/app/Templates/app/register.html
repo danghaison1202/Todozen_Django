@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    {% load static %}
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title></title>
+    <meta name="description" content="" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="{% static 'app\css\register.css' %}" />
+  </head>
+  <body>
+    <!--  [if lt IE 7]>
+            <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="#">upgrade your browser</a> to improve your experience.</p>
+        <![endif]  -->
+
+    <script src="" async defer></script>
+    {% comment %} <h5 id="title">Register</h5>
+    <form method="POST" action="">
+      {% csrf_token %}
+      <input type="submit" name="Create User" />
+    </form> {% endcomment %}
+    <form class="form" method="POST" action="">
+      {% csrf_token %}
+      <p class="title">Register</p>
+
+      <label>
+        <span>UserName</span>
+        {{ form.username }}
+      </label>
+
+      <label>
+        
+        <span>Firstname</span>
+        {{ form.first_name }}
+      </label>
+
+      <label>
+        <span>Lastname</span>
+        {{ form.last_name }}
+
+      </label>
+
+      <label>
+        <span>Email</span>
+        {{ form.email }}
+
+      </label>
+
+      <label>
+        <span>Password</span>
+        {{ form.password1 }}
+
+      </label>
+      <label>
+        <span>Confirm password</span>
+        {{ form.password2 }}
+
+      </label>
+      <input class="submit" type="submit" name="Create User" />
+      <p class="signin">Already have an acount ? <a href={% url 'login' %}>Sign In</a> </p>
+    </form>
+  </body>
+</html>

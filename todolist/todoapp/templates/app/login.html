@@ -1,0 +1,27 @@
+{% extends "main/header.html" %}
+{% block content %}
+<div class="container">
+  <form class="form" method="POST" action="">
+    {% csrf_token %}
+    <p class="title">Log In</p>
+
+    <label>
+      {% comment %} {{ form.username }} {% endcomment %}
+      <input class="input" name="username" type="text" placeholder="" required="" />
+      <span>UserName</span>
+    </label>
+
+    <label>
+      <input class="input" name="password" type="password" placeholder="" required="" />
+      <span>Password</span>
+    </label>
+
+    <input class="submit" type="submit" name="Create User" />
+    <p class="signin">
+      Don't have an acount ? <a href="{% url 'register' %}">Sign Up</a>
+    </p>
+  </form>
+</div>
+{% endblock content %}
+    
+   

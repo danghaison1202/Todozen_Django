@@ -40,6 +40,8 @@ INSTALLED_APPS = [
     'todoapp',
     'crispy_forms',
     'crispy_bootstrap4',
+    # 'django_recaptcha',
+
 
 ]
 
@@ -128,6 +130,18 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap4"
 
 CRISPY_TEMPLATE_PACK = "bootstrap4"
+
+# Emailing settings
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_FROM = 'sondangcvta@gmail.com'
+EMAIL_HOST_USER = 'sondangcvta@gmail.com'
+EMAIL_HOST_PASSWORD = 'wmwhipquxufpbscr'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+
+PASSWORD_RESET_TIMEOUT = 14400

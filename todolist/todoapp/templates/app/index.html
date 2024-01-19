@@ -1,4 +1,5 @@
 {% extends "main/header.html" %}
+{% load crispy_forms_tags %}
 
 {% block content %}
 <div>
@@ -7,16 +8,38 @@
     <form action="" method="POST">
       {% csrf_token %}
       <input type="text" name="title" id="myInput" placeholder="Title...">
+      <input type="datetime-local" id="myInput" name="finish_date" required>
       <button type="submit" class="addBtn">Add</button>
-    </form>
+    </form> 
   </div>
   
   <ul id="myUL">
-    {% for todo in todos reversed %}
-    <li>{{todo.title | title}} <span class="close"><a style="text-decoration: none; color: black;" href="delete/{{todo.id}}">Delete</a></span>
-      </li>
-    {% endfor %}
+    <h3> Your To do </h3>
+    
+    {% comment %} <li>{{todo.title | title}}<span class="close"><a style="text-decoration: none; color: black;" href="delete/{{todo.id}}">Delete</a></span>
+      </li> {% endcomment %}
+      
+      <table class="table  ">
+        <thead class="table-dark">
+          <tr>
+            <td>Name</td>
+            <td>Finish Day</td>
+            <td>Finished</td>
+            <td></td>
+          </tr>
+        </thead>
+        {% for todo in todos%}
+        <tbody>
+          <tr>
+            <td>{{todo.title}}</td>
+            <td>{{todo.finish_date}}</td>
+            <td><input type="checkbox"></td>
+            <td><a style="text-decoration: none; color: black;" href="delete/{{todo.id}}">Delete</a></td>
+          </tr>
+        </tbody>
+        {% endfor %}
+      </table>
   </ul>
   </div>
   
-  {% endblock content %} 
+{% endblock content %} 

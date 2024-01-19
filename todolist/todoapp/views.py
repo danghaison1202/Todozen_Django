@@ -1,6 +1,5 @@
 from django.shortcuts import render, redirect
 from .models import Todo
-from .models import *
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout, get_user_model
 from django.contrib import messages
@@ -10,24 +9,22 @@ from .tokens import account_activation_token
 from django.core.mail import EmailMessage
 from django.template.loader import render_to_string
 from django.contrib.sites.shortcuts import get_current_site
-from .forms import UserRegistrationForm, UserLoginForm, UserUpdateForm
+from .forms import UserLoginForm, UserRegistrationForm, UserUpdateForm
 from django.contrib.auth.forms import AuthenticationForm, SetPasswordForm, PasswordResetForm
 from django.db.models.query_utils import Q
-
-
-
+from datetime import datetime, timedelta
 
 # Create your views here.
 #to do manage
 def index(request):
-    todo = Todo.objects.all()
-
+    todo = Todo.objects.filter()
     if request.method == 'POST':
         new_todo = Todo(
-            title = request.POST['title']
+            title = request.POST['title'],
+            finish_date = request.POST['finish_date']
         )
         new_todo.save()
-        return redirect('/')
+        return redirect('index')
     return render(request, 'app/index.html', {'todos': todo})
 
 def delete(request, pk):
@@ -36,6 +33,7 @@ def delete(request, pk):
     return redirect('/')
 
 
+################ User ################
 def register(request):
     if request.method == "POST":
         form = UserRegistrationForm(request.POST)
@@ -44,7 +42,7 @@ def register(request):
             user.is_active=False
             user.save()
             activateEmail(request, user, form.cleaned_data.get('email'))
-            return redirect('index')
+            return redirect('/')
 
         else:
             for error in list(form.errors.values()):
@@ -154,12 +152,12 @@ def profile(request, username):
             context={"form": form}
             )
     
-    return redirect("index")
+    return redirect("/")
 
 ######### unauth homepage ############
 def unauth_home(request):
     if request.user.is_authenticated:
-        return render(request, 'app/index.html')
+        return render(request, 'app/todo_list.html')
     return render(request, 'main/home.html')
     
 ####################### change password ################
@@ -209,7 +207,7 @@ def password_reset_request(request):
                 else:
                     messages.error(request, "Problem sending reset password email, <b>SERVER PROBLEM</b>")
 
-            return redirect('index')
+            return redirect('/')
 
     form = PasswordResetForm()
     return render(
@@ -232,7 +230,7 @@ def passwordResetConfirm(request, uidb64, token):
             if form.is_valid():
                 form.save()
                 messages.success(request, "Your password has been set. You may go ahead and <b>log in </b> now.")
-                return redirect('index')
+                return redirect('/')
             else:
                 for error in list(form.errors.values()):
                     messages.error(request, error)
@@ -243,4 +241,41 @@ def passwordResetConfirm(request, uidb64, token):
         messages.error(request, "Link is expired")
 
     messages.error(request, 'Something went wrong, redirecting back to Homepage')
-    return redirect("index")
+    return redirect("/")
+# Check finish date #
+def check_date(request,user, due_date):
+    # Chuyển đổi chuỗi ngày từ database thành đối tượng datetime
+    due_date = datetime.strptime(due_date, '%Y-%m-%d').date()
+
+    # Lấy ngày hôm nay
+    today = datetime.now().date()
+
+    # Kiểm tra xem ngày hôm nay đã gần đến hoặc đã quá hạn so với ngày được đặt trước
+    if today >= due_date :
+        # Gửi thông báo lên giao diện (có thể thay đổi thông điệp tùy ý)
+        activateEmail(request, user, form.cleaned_data.get('email'))
+
+        # Pass thông báo vào context để hiển thị trong template
+        context = {'message': message}
+
+        # Render trang hiện tại với thông báo
+        return render(request, 'your_template.html', context)
+    else:
+        # Nếu chưa gần đến ngày, tiếp tục xử lý hoặc chuyển hướng đến trang khác
+        # Ví dụ: nếu bạn muốn chuyển hướng đến trang "success", sử dụng redirect
+        return redirect('success')  # Thay 'success' bằng tên đường dẫn thích hợp
+
+def notificationEmail(request, user, to_email):
+    mail_subject = "To do Notification!."
+    message = render_to_string("user/out_of_date_warning.html", {
+        'user': user.username,
+        'domain': get_current_site(request).domain,
+        'uid': urlsafe_base64_encode(force_bytes(user.pk)),
+        'token': account_activation_token.make_token(user),
+        "protocol": 'https' if request.is_secure() else 'http'
+    })
+    email = EmailMessage(mail_subject, message, to=[to_email])
+    if email.send():
+        messages.success(request, f'Dear <b>{user}</b>, please go to you email <b>{to_email}</b> inbox and check your notification. <b>Note:</b> Check your spam folder.')
+    else:
+        messages.error(request, f'Problem sending email to {to_email}, check if you typed it correctly.')

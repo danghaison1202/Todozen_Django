@@ -5,6 +5,7 @@ from django.contrib.auth import get_user_model
 # from captcha import ReCaptchaV2Checkbox
 from django_recaptcha.fields import ReCaptchaField
 from django_recaptcha.widgets import ReCaptchaV2Checkbox
+from .models import Todo
 
 
 class UserRegistrationForm(UserCreationForm):
@@ -42,3 +43,11 @@ class UserUpdateForm(forms.ModelForm):
         model = get_user_model()
         fields = ['first_name', 'last_name', 'email']
 
+# forms.py
+
+class TodoUpdateForm(forms.ModelForm):
+    class Meta:
+        model = Todo
+        fields = ['title', 'finish_date','complete']  # Chọn các trường muốn cập nhật
+
+    # Bạn có thể thêm validation hoặc customization khác nếu cần

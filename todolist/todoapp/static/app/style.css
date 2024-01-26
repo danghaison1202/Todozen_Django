@@ -418,3 +418,15 @@ input {
     color: #fff;
 }
 /* Welcome homepage*/
+.completed {
+    text-decoration: line-through;
+}
+
+.a_index{
+    text-decoration: none;
+    color: black;
+}
+.a_index:hover{
+    text-decoration: underline;
+    color: blue;
+}

@@ -24,17 +24,18 @@
           <tr>
             <td>Name</td>
             <td>Finish Day</td>
-            <td>Finished</td>
+            <td>Options</td>
             <td></td>
+
           </tr>
         </thead>
         {% for todo in todos%}
         <tbody>
           <tr>
-            <td>{{todo.title}}</td>
-            <td>{{todo.finish_date}}</td>
-            <td><input type="checkbox"></td>
-            <td><a style="text-decoration: none; color: black;" href="delete/{{todo.id}}">Delete</a></td>
+            <td {% if todo.complete %} class="completed" {% endif %} >{{todo.title}}</td>
+            <td {% if todo.complete %} class="completed" {% endif %}>{{todo.finish_date}}</td>
+            <td><a class="a_index" href="update_todo/{{todo.id}}">Update</a></td>
+            <td><a class="a_index" href="delete/{{todo.id}}">Delete</a></td>
           </tr>
         </tbody>
         {% endfor %}

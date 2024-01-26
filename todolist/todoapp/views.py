@@ -1,5 +1,6 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from .models import Todo
+from .forms import TodoUpdateForm
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout, get_user_model
 from django.contrib import messages
@@ -13,36 +14,95 @@ from .forms import UserLoginForm, UserRegistrationForm, UserUpdateForm
 from django.contrib.auth.forms import AuthenticationForm, SetPasswordForm, PasswordResetForm
 from django.db.models.query_utils import Q
 from datetime import datetime, timedelta
+from django.contrib.auth.models import User
+
 
 # Create your views here.
 #to do manage
-def index(request):
-    todo = Todo.objects.filter()
+def index(request): 
+    # todo = Todo.objects.filter()
+    # if request.method == 'POST':
+    #     new_todo = Todo(
+    #         title = request.POST['title'],
+    #         finish_date = request.POST['finish_date']
+    #     )
+    #     new_todo.save()
+    #     return redirect('index')
+    # return render(request, 'app/index.html', {'todos': todo})
+    if not request.user.is_authenticated:
+        messages.error(request, 'Please login to continue your work!')
+        return redirect('login')  # Thay 'login' bằng URL đến trang đăng nhập của bạn
+
+    todos = Todo.objects.filter(user=request.user)
+
     if request.method == 'POST':
         new_todo = Todo(
-            title = request.POST['title'],
-            finish_date = request.POST['finish_date']
+            title=request.POST['title'],
+            finish_date=request.POST['finish_date'],
+            user=request.user
         )
         new_todo.save()
         return redirect('index')
-    return render(request, 'app/index.html', {'todos': todo})
+
+    return render(request, 'app/index.html', {'todos': todos})
 
 def delete(request, pk):
     todo = Todo.objects.get(id=pk)
     todo.delete()
     return redirect('/')
 
+def update_todo(request, todo_id):
+    # Lấy todo cần cập nhật hoặc trả về 404 nếu không tìm thấy
+    todo = get_object_or_404(Todo, id=todo_id, user=request.user)
 
+    if request.method == 'POST':
+        # Nếu là POST request, xử lý dữ liệu form được submit
+        form = TodoUpdateForm(request.POST, instance=todo)
+        if form.is_valid():
+            form.save()
+            return redirect('index')  # Chuyển hướng về trang danh sách todo sau khi cập nhật
+    else:
+        # Nếu là GET request, hiển thị form với dữ liệu hiện tại của todo
+        form = TodoUpdateForm(instance=todo)
+
+    return render(request, 'app/update_todo.html', {'form': form, 'todo': todo})
 ################ User ################
 def register(request):
+    # if request.method == "POST":
+    #     form = UserRegistrationForm(request.POST)
+    #     if form.is_valid():
+    #         user = form.save(commit=False)
+    #         user.is_active=False
+    #         user.save()
+    #         activateEmail(request, user, form.cleaned_data.get('email'))
+    #         return redirect('/')
+
+    #     else:
+    #         for error in list(form.errors.values()):
+    #             messages.error(request, error)
+
+    # else:
+    #     form = UserRegistrationForm()
+
+    # return render(
+    #     request=request,
+    #     template_name="user/register.html",
+    #     context={"form": form}
+    #     )
     if request.method == "POST":
         form = UserRegistrationForm(request.POST)
         if form.is_valid():
-            user = form.save(commit=False)
-            user.is_active=False
-            user.save()
-            activateEmail(request, user, form.cleaned_data.get('email'))
-            return redirect('/')
+            email = form.cleaned_data.get('email')
+            
+            # Check if the email already exists
+            if User.objects.filter(email=email).exists():
+                messages.error(request, 'This email is already registered.')
+            else:
+                user = form.save(commit=False)
+                user.is_active = False
+                user.save()
+                activateEmail(request, user, email)
+                return redirect('/')
 
         else:
             for error in list(form.errors.values()):
@@ -55,7 +115,7 @@ def register(request):
         request=request,
         template_name="user/register.html",
         context={"form": form}
-        )
+    )
 @login_required
 ################### logout user #############################
 def custom_logout(request):

@@ -2,15 +2,15 @@
 
 {% block content %}
 
-<div class="header-bar">
-  <a href="{% url 'task_list' %}">&#8592; Back</a>
-</div>
 
 <div class="card-body">
   <form method="POST">
     {% csrf_token %}
-    <p>Are you sure you want to delete this task?</p>
-    <input class="button" type="submit" value="Delete">
+    <p>Are you sure you want to delete {{todo.title}} </p>
+    {% comment %} <input class="button" type="submit" value="Delete"> {% endcomment %}
+    <a class="a_index" href="delete/{{todo.id}}">Delete</a>
+    <a class="a_index" href="update_todo/{{todo.id}}">Cancel</a>
+
   </form>
 </div>
 

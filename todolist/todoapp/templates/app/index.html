@@ -8,7 +8,10 @@
     <form action="" method="POST">
       {% csrf_token %}
       <input type="text" name="title" id="myInput" placeholder="Title...">
+      <input type="text" name="description" id="myInput" placeholder="Description...">
+
       <input type="datetime-local" id="myInput" name="finish_date" required>
+
       <button type="submit" class="addBtn">Add</button>
     </form> 
   </div>
@@ -23,6 +26,7 @@
         <thead class="table-dark">
           <tr>
             <td>Name</td>
+            <td>Description</td>
             <td>Finish Day</td>
             <td>Options</td>
             <td></td>
@@ -33,9 +37,13 @@
         <tbody>
           <tr>
             <td {% if todo.complete %} class="completed" {% endif %} >{{todo.title}}</td>
+            <td {% if todo.complete %} class="completed" {% endif %} >{{todo.description}}</td>
             <td {% if todo.complete %} class="completed" {% endif %}>{{todo.finish_date}}</td>
             <td><a class="a_index" href="update_todo/{{todo.id}}">Update</a></td>
-            <td><a class="a_index" href="delete/{{todo.id}}">Delete</a></td>
+            {% comment %} <td><a id="deleteBtn" class="a_index"  href="delete/{{todo.id}}">Delete</a></td> {% endcomment %}
+            {% comment %} <td><button onclick="showDeleteConfirmation()"><a id="deleteBtn" class="a_index" >Delete</a></button></td> {% endcomment %}
+            <td><a href="delete/{{todo.id}}" onclick="return confirmDelete({{todo.id}})">Delete</a></td>
+
           </tr>
         </tbody>
         {% endfor %}
@@ -43,4 +51,22 @@
   </ul>
   </div>
   
+  <script>
+    function confirmDelete(todoId) {
+      var result = confirm("Bạn có chắc chắn muốn xóa?");
+      if (result) {
+        // Nếu người dùng nhấn OK
+        //alert("Xóa thành công!");
+        // Thực hiện công việc xóa ở đây, ví dụ:
+         window.location.href = "delete/" + todoId;
+      } else {
+        // Nếu người dùng nhấn Cancel
+        alert("Đã hủy xóa.");
+        // Không thực hiện công việc xóa
+      }
+  
+      // Trả về false để ngăn chặn sự kiện mặc định của liên kết
+      return false;
+    }
+  </script>
 {% endblock content %} 

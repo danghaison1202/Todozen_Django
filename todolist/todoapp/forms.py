@@ -48,6 +48,6 @@ class UserUpdateForm(forms.ModelForm):
 class TodoUpdateForm(forms.ModelForm):
     class Meta:
         model = Todo
-        fields = ['title', 'finish_date','complete']  # Chọn các trường muốn cập nhật
+        fields = ['description', 'finish_date','complete']  # Chọn các trường muốn cập nhật
 
     # Bạn có thể thêm validation hoặc customization khác nếu cần

@@ -39,6 +39,8 @@ def index(request):
         new_todo = Todo(
             title=request.POST['title'],
             finish_date=request.POST['finish_date'],
+            description=request.POST['description'],
+
             user=request.user
         )
         new_todo.save()
@@ -50,6 +52,9 @@ def delete(request, pk):
     todo = Todo.objects.get(id=pk)
     todo.delete()
     return redirect('/')
+
+def delete_confirm(request):
+    return render (request, 'app/delete_confirm.html')
 
 def update_todo(request, todo_id):
     # Lấy todo cần cập nhật hoặc trả về 404 nếu không tìm thấy
